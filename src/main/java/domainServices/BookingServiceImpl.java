@@ -3,6 +3,7 @@ package domainServices;
 import domainModel.*;
 import domainServices.discount.DiscountService;
 import domainServices.discount.DiscountsForSeats;
+import repositories.BookingRepository;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,23 +13,21 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BookingServiceImpl implements BookingService {
 
-    public BookingServiceImpl(DiscountService discountSvc){
+    public BookingServiceImpl(DiscountService discountSvc, BookingRepository rep){
         this.discountSvc = discountSvc;
-        _storage = new ArrayList<>();
+        this.rep = rep;
     }
 
-    private ArrayList<Ticket> _storage;
-    private static AtomicLong _ticketsCount = new AtomicLong(0);
 
     private static final double vipPriceCoefficient = 2;
     private static final double highRatedCoefficient = 1.2;
 
     private DiscountService discountSvc;
+    private BookingRepository rep;
 
     @Override
     public Ticket createTicket(User user, Event event, LocalDateTime dateTime, long seat) {
-        long id = _ticketsCount.addAndGet(1);
-        return new Ticket(id, user, event, dateTime, seat);
+        return rep.createTicket(user,event, dateTime, seat);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
     private void bookTicket(Ticket t) {
         User u = t.getUser();
         u.getTickets().add(t);
-        _storage.add(t);
+        rep.save(t);
     }
 
     @Nonnull
@@ -85,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
     public Set<Ticket> getPurchasedTicketsForEvent(@Nonnull Event event, @Nonnull LocalDateTime dateTime) {
         Set<Ticket> result = new HashSet<>();
 
-        for(Ticket t:_storage){
+        for(Ticket t:rep.getAll()){
             for(LocalDateTime date : t.getEvent().getAuditoriums().keySet()){
                 if(date.isEqual(dateTime)){
                     result.add(t);

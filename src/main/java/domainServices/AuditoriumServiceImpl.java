@@ -11,43 +11,39 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import repositories.AuditoriumRepository;
 
 public class AuditoriumServiceImpl implements AuditoriumService {
 
-    public AuditoriumServiceImpl(String configPath){
-        _storage = new TreeMap<>();
+    private AuditoriumRepository rep;
 
+    public AuditoriumServiceImpl(String configPath, AuditoriumRepository rep){
+        this.rep = rep;
         loadConfig(configPath);
     }
 
-    private TreeMap<String,Auditorium> _storage;
-    private static AtomicLong _usersCount = new AtomicLong(0);
 
     @Override
     public Auditorium create() {
-        long id = _usersCount.addAndGet(1);
-        return new Auditorium(id);
+        return rep.create();
     }
 
     @Override
     public void add(Auditorium auditorium) {
-        _storage.put(auditorium.getName(), auditorium);
+        rep.save(auditorium);
     }
 
     @Nonnull
     @Override
     public Collection<Auditorium> getAll() {
-
-        return _storage.values();
+        return rep.getAll();
     }
 
     @Nullable
     @Override
     public Auditorium getByName(@Nonnull String name) {
-        if(_storage.containsKey(name)){
-            return _storage.get(name);
-        }
-        return null;
+        Optional<Auditorium> a = rep.tryGetFirst(x -> x.getName().equals(name));
+        return a.isPresent() ? a.get() : null;
     }
 
 
@@ -90,7 +86,8 @@ public class AuditoriumServiceImpl implements AuditoriumService {
         aud.setName(name);
         aud.setNumberOfSeats(numberOfSeats);
         aud.setVipSeats(vipSeats);
-        _storage.put(name, aud);
+
+        rep.save(aud);
     }
 
 
