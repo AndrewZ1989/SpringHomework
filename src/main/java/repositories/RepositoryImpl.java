@@ -16,7 +16,7 @@ public abstract class RepositoryImpl<T extends DomainObject> implements Reposito
     }
 
     protected ArrayList<T> _storage;
-    protected static volatile AtomicLong _objCount = new AtomicLong(0);
+    protected volatile AtomicLong _objCount = new AtomicLong(0);
 
     @Override
     public Optional<T> tryGetFirst(Predicate<T> p) {
