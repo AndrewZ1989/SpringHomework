@@ -1,9 +1,6 @@
 package ui.state;
 
 import java.util.Collection;
-import java.util.Set;
-
-import org.springframework.context.ApplicationContext;
 
 import domainModel.Auditorium;
 import domainServices.AuditoriumService;
@@ -13,11 +10,11 @@ import domainServices.AuditoriumService;
  *
  * @author Yuriy_Tkach
  */
-public class AuditoriumManageState extends AbstractState {
+public class AuditoriumManageMenu extends AbstractMenu {
 
     private AuditoriumService auditoriumService;
 
-    public AuditoriumManageState(AuditoriumService svc) {
+    public AuditoriumManageMenu(AuditoriumService svc) {
         auditoriumService = svc;
     }
 

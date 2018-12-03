@@ -2,7 +2,6 @@ package ui;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashSet;
 
 import org.springframework.context.ApplicationContext;
 
@@ -16,9 +15,8 @@ import domainServices.AuditoriumService;
 import domainServices.BookingService;
 import domainServices.EventService;
 import domainServices.UserService;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import ui.state.InitialState;
+import ui.state.InitialMenu;
 
 /**
  */
@@ -33,7 +31,7 @@ public class ConsoleUI {
     }
 
     private void initContext() {
-        context = new FileSystemXmlApplicationContext("src/main/resources/springConfig.xml");
+        context = new FileSystemXmlApplicationContext("target/resources/springConfig.xml", "target/resources/discount.xml");
     }
 
     private void run() {
@@ -41,7 +39,7 @@ public class ConsoleUI {
 
         fillInitialData();
 
-        InitialState state = new InitialState(context);
+        InitialMenu state = new InitialMenu(context);
 
         state.run();
 
@@ -54,7 +52,7 @@ public class ConsoleUI {
         AuditoriumService auditoriumService = context.getBean(AuditoriumService.class);
         BookingService bookingService = context.getBean(BookingService.class);
 
-        Auditorium newAuditorium = new Auditorium();
+        Auditorium newAuditorium = auditoriumService.create();
         newAuditorium.setName("Test");
         newAuditorium.setNumberOfSeats(100);
 
@@ -68,31 +66,31 @@ public class ConsoleUI {
             throw new IllegalStateException("Failed to fill initial data - no seats in the auditorium " + auditorium.getName());
         }
 
-        User user = new User();
+        User user = userService.createNew(LocalDateTime.of(2000, 10,1,11,00));
         user.setEmail("my@email.com");
         user.setFirstName("Foo");
         user.setLastName("Bar");
 
-        user = userService.save(user);
+        userService.save(user);
 
-        Event event = new Event();
+        Event event = eventService.create();
         event.setName("Grand concert");
         event.setRating(EventRating.MID);
         event.setBasePrice(10);
         LocalDateTime airDate = LocalDateTime.of(2020, 6, 15, 19, 30);
         event.addAirDateTime(airDate, auditorium);
 
-        event = eventService.save(event);
+        eventService.save(event);
 
-        Ticket ticket1 = new Ticket(user, event, airDate, 1);
+        Ticket ticket1 = bookingService.createTicket(user, event, airDate, 1);
         bookingService.bookTickets(Collections.singleton(ticket1));
 
         if (auditorium.getNumberOfSeats() > 1) {
-            User userNotRegistered = new User();
+            User userNotRegistered = userService.createNew(LocalDateTime.of(2009,6,3,14,1));
             userNotRegistered.setEmail("somebody@a.b");
             userNotRegistered.setFirstName("A");
             userNotRegistered.setLastName("Somebody");
-            Ticket ticket2 = new Ticket(userNotRegistered, event, airDate, 2);
+            Ticket ticket2 = bookingService.createTicket(userNotRegistered, event, airDate, 2);
             bookingService.bookTickets(Collections.singleton(ticket2));
         }
     }

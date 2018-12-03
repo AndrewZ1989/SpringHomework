@@ -2,16 +2,11 @@ package ui.state;
 
 
 import java.time.LocalDateTime;
-        import java.util.Arrays;
-        import java.util.List;
-        import java.util.NavigableSet;
-        import java.util.Set;
-        import java.util.function.Function;
+import java.util.*;
+import java.util.function.Function;
         import java.util.stream.Collectors;
 
-        import org.springframework.context.ApplicationContext;
-
-        import domainModel.Auditorium;
+import domainModel.Auditorium;
         import domainModel.DomainObject;
         import domainModel.Event;
         import domainModel.Ticket;
@@ -22,15 +17,15 @@ import java.time.LocalDateTime;
         import domainServices.EventService;
         import domainServices.UserService;
 
-public class BookingManageState extends AbstractState {
+public class BookingManageMenu extends AbstractMenu {
 
     private final BookingService bookingService;
     private final UserService userService;
     private final EventService eventService;
 
-    public BookingManageState(BookingService bookingSvc,
-                              UserService userSvc,
-                              EventService eventSvc) {
+    public BookingManageMenu(BookingService bookingSvc,
+                             UserService userSvc,
+                             EventService eventSvc) {
         this.bookingService = bookingSvc;
         this.userService = userSvc;
         this.eventService = eventSvc;
@@ -68,11 +63,13 @@ public class BookingManageState extends AbstractState {
 
     private void getBookedTickets() {
         System.out.println("> Select event: ");
-        Event event = selectDomainObject(eventService, e -> e.getName());
-        if (event == null) {
+        Optional<Event> eventOpt = selectDomainObject(eventService, e -> e.getName());
+        if (!hasValue(eventOpt)) {
             System.err.println("No event found");
             return;
         }
+
+        Event event = eventOpt.get();
 
         System.out.println("> Select air dates: ");
         LocalDateTime airDate = selectAirDate(event.getAirDates());
@@ -84,11 +81,13 @@ public class BookingManageState extends AbstractState {
 
     private void bookTickets() {
         System.out.println("> Select event: ");
-        final Event event = selectDomainObject(eventService, e -> e.getName());
-        if (event == null) {
+        final Optional<Event> eventOpt = selectDomainObject(eventService, e -> e.getName());
+        if (!hasValue(eventOpt)) {
             System.err.println("No event found");
             return;
         }
+
+        Event event = eventOpt.get();
 
         System.out.println("> Select air dates: ");
         final LocalDateTime airDate = selectAirDate(event.getAirDates());
@@ -96,44 +95,52 @@ public class BookingManageState extends AbstractState {
         final Set<Long> seats = selectSeats(event, airDate);
         System.out.println("> Select user: ");
         final User userForBooking;
-        User user = selectDomainObject(userService, u -> u.getFirstName() + " " + u.getLastName());
-        if (user == null) {
+
+        Optional<User> userOpt = selectDomainObject(userService, u -> u.getFirstName() + " " + u.getLastName());
+        if (userOpt == null || !userOpt.isPresent()) {
             System.out.println("No user found. Input user info for booking: ");
             String email = readStringInput("Email: ");
             String firstName = readStringInput("First name: ");
             String lastName = readStringInput("Last name: ");
-            userForBooking = new User();
+            LocalDateTime birthDate = readDateTimeInput("Birth date: ");
+
+            userForBooking = userService.createNew(birthDate);
             userForBooking.setEmail(email);
             userForBooking.setFirstName(firstName);
             userForBooking.setLastName(lastName);
         } else {
-            userForBooking = user;
+            userForBooking = userOpt.get();
         }
 
-        Set<Ticket> ticketsToBook = seats.stream().map(seat -> new Ticket(userForBooking, event, airDate, seat)).collect(Collectors.toSet());
+        Set<Ticket> ticketsToBook = seats.stream().map(seat -> bookingService.createTicket(userForBooking, event, airDate, seat)).collect(Collectors.toSet());
         bookingService.bookTickets(ticketsToBook);
-        double price = bookingService.getTicketsPrice(event, airDate, user, seats);
+        double price = bookingService.getTicketsPrice(event, airDate, userOpt.get(), seats);
 
         System.out.println("Tickets booked! Total price: " + price);
     }
 
     private void getTicketsPrice() {
         System.out.println("> Select event: ");
-        Event event = selectDomainObject(eventService, e -> e.getName());
-        if (event == null) {
+        Optional<Event> eventOpt = selectDomainObject(eventService, e -> e.getName());
+        if (!hasValue(eventOpt)) {
             System.err.println("No event found");
             return;
         }
+
+        Event event = eventOpt.get();
 
         System.out.println("> Select air dates: ");
         LocalDateTime airDate = selectAirDate(event.getAirDates());
         System.out.println("> Select seats: ");
         Set<Long> seats = selectSeats(event, airDate);
         System.out.println("> Select user: ");
-        User user = selectDomainObject(userService, u -> u.getFirstName() + " " + u.getLastName());
-        if (user == null) {
+
+        Optional<User> userOpt = selectDomainObject(userService, u -> u.getFirstName() + " " + u.getLastName());
+        if (userOpt == null || !userOpt.isPresent()) {
             System.out.println("No user found");
         }
+
+        User user = userOpt.get();
 
         double price = bookingService.getTicketsPrice(event, airDate, user, seats);
         printDelimiter();
@@ -172,7 +179,7 @@ public class BookingManageState extends AbstractState {
         return list.get(dateIndex);
     }
 
-    private <T extends DomainObject> T selectDomainObject(AbstractDomainObjectService<T> service, Function<T, String> displayFunction) {
+    private <T extends DomainObject> Optional<T> selectDomainObject(AbstractDomainObjectService<T> service, Function<T, String> displayFunction) {
         if (!service.getAll().isEmpty()) {
             service.getAll().forEach(obj -> System.out.println("[" + obj.getId() + "] " + displayFunction.apply(obj)));
             long id = readIntInput("Input id (-1 for nothing): ");

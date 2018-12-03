@@ -12,30 +12,30 @@ import org.springframework.context.ApplicationContext;
 
 /**
  */
-public class InitialState extends AbstractState {
+public class InitialMenu extends AbstractMenu {
 
-    private Map<Integer, AbstractState> childStates = new HashMap<>();
+    private Map<Integer, AbstractMenu> childStates = new HashMap<>();
 
-    public InitialState(ApplicationContext context) {
+    public InitialMenu(ApplicationContext context) {
 
         UserService usersSvc = context.getBean(UserService.class);
         EventService eventsSvc = context.getBean(EventService.class);
         AuditoriumService auditoriumSvc = context.getBean(AuditoriumService.class);
         BookingService bookingSvc = context.getBean(BookingService.class);
 
-        childStates.put(1, new AuditoriumManageState(auditoriumSvc));
+        childStates.put(1, new AuditoriumManageMenu(auditoriumSvc));
 
-        childStates.put(2, new EventsManageState(eventsSvc, auditoriumSvc)
+        childStates.put(2, new EventsManageMenu(eventsSvc, auditoriumSvc)
         );
-        childStates.put(3, new UserManageState(usersSvc));
+        childStates.put(3, new UserManageMenu(usersSvc));
 
-        childStates.put(4, new BookingManageState(bookingSvc, usersSvc, eventsSvc)
+        childStates.put(4, new BookingManageMenu(bookingSvc, usersSvc, eventsSvc)
         );
     }
 
     @Override
     protected void runAction(int action) {
-        AbstractState state = childStates.get(action);
+        AbstractMenu state = childStates.get(action);
         if (state != null) {
             state.run();
         } else {

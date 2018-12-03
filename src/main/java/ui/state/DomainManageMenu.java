@@ -3,14 +3,16 @@ package ui.state;
 import domainModel.DomainObject;
 import domainServices.AbstractDomainObjectService;
 
+import java.util.Optional;
+
 /**
  */
-public abstract class DomainManageState<T extends DomainObject, S extends AbstractDomainObjectService<T>>
-        extends AbstractState {
+public abstract class DomainManageMenu<T extends DomainObject, S extends AbstractDomainObjectService<T>>
+        extends AbstractMenu {
 
     protected S service;
 
-    public DomainManageState(S service) {
+    public DomainManageMenu(S service) {
         this.service = service;
     }
 
@@ -63,11 +65,11 @@ public abstract class DomainManageState<T extends DomainObject, S extends Abstra
 
     private void removeObject() {
         int id = readIntInput("Input id: ");
-        T obj = service.getById(Long.valueOf(id));
-        if (obj == null) {
+        Optional<T> obj = service.getById(Long.valueOf(id));
+        if (obj == null || !obj.isPresent()) {
             System.out.println("Not found (searched for " + id + ")");
         } else {
-            service.remove(obj);
+            service.remove(obj.get());
             System.out.println("Removed");
             printDefaultInformation();
         }
@@ -75,11 +77,11 @@ public abstract class DomainManageState<T extends DomainObject, S extends Abstra
 
     private void findObjectById() {
         int id = readIntInput("Input id: ");
-        T obj = service.getById(Long.valueOf(id));
-        if (obj == null) {
+        Optional<T> obj = service.getById(Long.valueOf(id));
+        if (obj == null || !obj.isPresent()) {
             System.out.println("Not found (searched for " + id + ")");
         } else {
-            printObject(obj);
+            printObject(obj.get());
         }
     }
 
@@ -90,10 +92,10 @@ public abstract class DomainManageState<T extends DomainObject, S extends Abstra
     private void addObject() {
         T obj = createObject();
 
-        T newObj = service.save(obj);
+        service.save(obj);
 
         System.out.println("Added");
-        printObject(newObj);
+        printObject(obj);
     }
 
 }

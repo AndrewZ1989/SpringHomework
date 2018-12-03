@@ -2,12 +2,13 @@ package ui.state;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Function;
 
 /**
  */
-public abstract class AbstractState {
+public abstract class AbstractMenu {
     public static final String DATE_TIME_INPUT_PATTERN = "yyyy-MM-dd HH:mm";
 
     private static Scanner scanner = new Scanner(System.in, "UTF-8");
@@ -80,6 +81,10 @@ public abstract class AbstractState {
 
     protected String formatDateTime(LocalDateTime dt) {
         return DateTimeFormatter.ofPattern(DATE_TIME_INPUT_PATTERN).format(dt);
+    }
+
+    protected <TOpt> boolean hasValue(Optional<TOpt> opt){
+        return opt != null && opt.isPresent();
     }
 
     protected abstract void printDefaultInformation();

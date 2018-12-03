@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 
-public class Auditorium {
+public class Auditorium extends DomainObject {
 
     private String name;
 
@@ -16,7 +16,8 @@ public class Auditorium {
 
     private Set<Long> vipSeats = Collections.emptySet();
 
-    public Auditorium() {
+    public Auditorium(Long id) {
+        super(id);
     }
 
     /**

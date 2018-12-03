@@ -1,0 +1,19 @@
+[
+
+  {
+    "auditorium":{
+      "name" : "First auditorium",
+      "numberOfSeats" : 100,
+      "vipSeats":[1,2,3,4,5]
+    }
+  },
+
+  {
+    "auditorium":{
+      "name" : "Third auditorium",
+      "numberOfSeats" : 20,
+      "vipSeats":[1,2,4,5]
+    }
+  }
+
+]

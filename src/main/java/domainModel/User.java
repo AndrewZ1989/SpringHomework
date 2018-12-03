@@ -1,5 +1,6 @@
 package domainModel;
 
+import java.time.LocalDateTime;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -7,13 +8,30 @@ import java.util.TreeSet;
 
 public class User extends DomainObject {
 
+    public User(Long id, LocalDateTime _birthDate)
+    {
+        super(id);
+        birthDate = _birthDate;
+    }
+
     private String firstName;
 
     private String lastName;
 
     private String email;
 
+    private LocalDateTime birthDate;
+
     private NavigableSet<Ticket> tickets = new TreeSet<>();
+
+
+    public LocalDateTime getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDateTime date){
+        birthDate = date;
+    }
 
     public String getFirstName() {
         return firstName;

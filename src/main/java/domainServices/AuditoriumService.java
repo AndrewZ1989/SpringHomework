@@ -5,21 +5,31 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import domainModel.Auditorium;
-
+import org.springframework.util.StringUtils;
 
 
 /**
  */
 public interface AuditoriumService {
 
-    public void add(Auditorium auditorium);
+    /**
+     *
+     * @return
+     */
+    Auditorium create();
+
+    /**
+     *
+     * @param auditorium
+     */
+    void add(Auditorium auditorium);
 
     /**
      * Getting all auditoriums from the system
      *
      * @return set of all auditoriums
      */
-    public @Nonnull
+    @Nonnull
     Collection<Auditorium> getAll();
 
     /**
@@ -29,7 +39,7 @@ public interface AuditoriumService {
      *            Name of the auditorium
      * @return found auditorium or <code>null</code>
      */
-    public @Nullable Auditorium getByName(@Nonnull String name);
+    @Nullable Auditorium getByName(@Nonnull String name);
 
 }
 

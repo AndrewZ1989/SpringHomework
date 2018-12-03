@@ -11,6 +11,10 @@ import java.util.TreeSet;
 
 public class Event extends DomainObject {
 
+    public Event(Long id){
+        super(id);
+    }
+
     private String name;
 
     private NavigableSet<LocalDateTime> airDates = new TreeSet<>();
@@ -35,6 +39,7 @@ public class Event extends DomainObject {
     public boolean assignAuditorium(LocalDateTime dateTime, Auditorium auditorium) {
         if (airDates.contains(dateTime)) {
             auditoriums.put(dateTime, auditorium);
+            airDates.remove(dateTime);
             return true;
         } else {
             return false;
@@ -149,6 +154,7 @@ public class Event extends DomainObject {
     }
 
     public void setAirDates(NavigableSet<LocalDateTime> airDates) {
+
         this.airDates = airDates;
     }
 
@@ -173,6 +179,7 @@ public class Event extends DomainObject {
     }
 
     public void setAuditoriums(NavigableMap<LocalDateTime, Auditorium> auditoriums) {
+
         this.auditoriums = auditoriums;
     }
 

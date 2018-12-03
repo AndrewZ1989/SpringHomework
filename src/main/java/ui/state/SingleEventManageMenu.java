@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
         import domainServices.AuditoriumService;
         import domainServices.EventService;
 
-public class SingleEventManageState extends AbstractState {
+public class SingleEventManageMenu extends AbstractMenu {
 
     private Event event;
     private EventService eventService;
     private AuditoriumService auditoriumService;
 
-    public SingleEventManageState(Event event, EventService eventService, AuditoriumService auditoriumService) {
+    public SingleEventManageMenu(Event event, EventService eventService, AuditoriumService auditoriumService) {
         this.event = event;
         this.eventService = eventService;
         this.auditoriumService = auditoriumService;
@@ -58,18 +58,23 @@ public class SingleEventManageState extends AbstractState {
 
     private void assignAuditorium() {
         System.out.println("Select auditorium:");
+
         List<Auditorium> list = auditoriumService.getAll().stream().collect(Collectors.toList());
         for (int i = 0; i < list.size(); i++) {
             System.out.println("[" + (i+1) + "] " + list.get(i).getName());
         }
+
         int auditoriumIndex = readIntInput("Input index: ", list.size()) - 1;
         Auditorium aud = list.get(auditoriumIndex);
+
         System.out.println("Assigning auditorium: " + aud.getName());
+
         List<LocalDateTime> datesList = event.getAirDates().stream().collect(Collectors.toList());
         for (int i = 0; i < datesList.size(); i++) {
             System.out.println("[" + (i+1) + "] " + formatDateTime(datesList.get(i)));
         }
         int dateTimeIndex = readIntInput("Input air dateTime index: ", datesList.size()) - 1;
+
         LocalDateTime dt = datesList.get(dateTimeIndex);
         if (event.assignAuditorium(dt, aud)) {
             System.out.println("Assigned auditorium for air dateTime: " + formatDateTime(dt));

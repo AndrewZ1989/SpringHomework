@@ -1,6 +1,7 @@
 package domainServices;
 
 import java.util.Collection;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import domainModel.DomainObject;
 
@@ -11,6 +12,7 @@ import domainModel.DomainObject;
  */
 public interface AbstractDomainObjectService<T extends DomainObject> {
 
+
     /**
      * Saving new object to storage or updating existing one
      *
@@ -18,7 +20,7 @@ public interface AbstractDomainObjectService<T extends DomainObject> {
      *            Object to save
      * @return saved object with assigned id
      */
-    public T save(@Nonnull T object);
+    void save(@Nonnull T object);
 
     /**
      * Removing object from storage
@@ -26,7 +28,7 @@ public interface AbstractDomainObjectService<T extends DomainObject> {
      * @param object
      *            Object to remove
      */
-    public void remove(@Nonnull T object);
+    void remove(@Nonnull T object);
 
     /**
      * Getting object by id from storage
@@ -35,13 +37,13 @@ public interface AbstractDomainObjectService<T extends DomainObject> {
      *            id of the object
      * @return Found object or <code>null</code>
      */
-    public T getById(@Nonnull Long id);
+    Optional<T> getById(@Nonnull Long id);
 
     /**
      * Getting all objects from storage
      *
      * @return collection of objects
      */
-    public @Nonnull Collection<T> getAll();
+    @Nonnull Collection<T> getAll();
 }
 

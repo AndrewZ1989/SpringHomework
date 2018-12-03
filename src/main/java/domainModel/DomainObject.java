@@ -2,14 +2,18 @@ package domainModel;
 
 public class DomainObject {
 
-    private Long id;
+    public DomainObject(Long id){
+        _id = id;
+    }
+
+    private Long _id;
 
     public Long getId() {
-        return id;
+        return _id;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this._id = id;
     }
 
 }

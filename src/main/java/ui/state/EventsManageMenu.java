@@ -1,8 +1,9 @@
 package ui.state;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Locale;
-
-import org.springframework.context.ApplicationContext;
+import java.util.Optional;
 
 import domainModel.Event;
 import domainModel.EventRating;
@@ -15,12 +16,12 @@ import domainServices.EventService;
  *
  * @author Yuriy_Tkach
  */
-public class EventsManageState extends DomainManageState<Event, EventService> {
+public class EventsManageMenu extends DomainManageMenu<Event, EventService> {
 
     private AuditoriumService auditoriumService;
 
-    public EventsManageState(EventService eventsSvc,
-                             AuditoriumService auditoriumSvc) {
+    public EventsManageMenu(EventService eventsSvc,
+                            AuditoriumService auditoriumSvc) {
         super(eventsSvc);
         this.auditoriumService = auditoriumSvc;
     }
@@ -43,7 +44,7 @@ public class EventsManageState extends DomainManageState<Event, EventService> {
         EventRating rating = readEventRating();
         double basePrice = readDoubleInput("Base price: ");
 
-        Event event = new Event();
+        Event event = service.create();
         event.setName(name);
         event.setRating(rating);
         event.setBasePrice(basePrice);
@@ -69,6 +70,8 @@ public class EventsManageState extends DomainManageState<Event, EventService> {
         int index = maxDefaultActions;
         System.out.println(" " + (++index) + ") Find event by name");
         System.out.println(" " + (++index) + ") Manage event info (air dates, auditoriums)");
+        System.out.println(" " + (++index) + ") Returns events for specified date range");
+
         return index - maxDefaultActions;
     }
 
@@ -82,6 +85,9 @@ public class EventsManageState extends DomainManageState<Event, EventService> {
             case 2:
                 manageEventInfo();
                 break;
+            case 3:
+                getEventsRange();
+                break;
             default:
                 System.err.println("Unknown action");
         }
@@ -90,26 +96,37 @@ public class EventsManageState extends DomainManageState<Event, EventService> {
     private void manageEventInfo() {
         int id = readIntInput("Input event id: ");
 
-        Event event = service.getById(Long.valueOf(id));
-        if (event == null) {
+        Optional<Event> event = service.getById(Long.valueOf(id));
+        if (event == null || !event.isPresent()) {
             System.out.println("Not found (searched for " + id + ")");
         } else {
             printDelimiter();
 
-            AbstractState manageState = new SingleEventManageState(event, service, auditoriumService);
+            AbstractMenu manageState = new SingleEventManageMenu(event.get(), service, auditoriumService);
             manageState.run();
         }
     }
 
     private void findEventByName() {
         String name = readStringInput("Input event name: ");
-        Event event = service.getByName(name);
-        if (event == null) {
+        Optional<Event> event = service.getByName(name);
+        if (event == null || !event.isPresent()) {
             System.out.println("Not found (searched for " + name + ")");
         } else {
-            printObject(event);
+            printObject(event.get());
         }
     }
 
+    private void getEventsRange(){
+
+        LocalDateTime fromDate = readDateTimeInput("From date (" + DATE_TIME_INPUT_PATTERN + "): ");
+        LocalDateTime toDate = readDateTimeInput("To date (" + DATE_TIME_INPUT_PATTERN + "): ");
+
+        Collection<Event> events = service.getForDateRange(fromDate, toDate);
+
+        for(Event e : events){
+            printObject(e);
+        }
+    }
 }
 

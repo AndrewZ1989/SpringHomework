@@ -1,15 +1,17 @@
 package ui.state;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
-import org.springframework.context.ApplicationContext;
+import java.util.Optional;
+
 import domainModel.User;
 import domainServices.UserService;
 
 /**
  */
-public class UserManageState extends DomainManageState<User, UserService> {
+public class UserManageMenu extends DomainManageMenu<User, UserService> {
 
-    public UserManageState(UserService userService) {
+    public UserManageMenu(UserService userService) {
         super(userService);
     }
 
@@ -34,11 +36,11 @@ public class UserManageState extends DomainManageState<User, UserService> {
 
     private void findUserByEmail() {
         String email = readStringInput("Input user e-mail: ");
-        User user = service.getUserByEmail(email);
-        if (user == null) {
+        Optional<User> userOpt = service.getUserByEmail(email);
+        if (!hasValue(userOpt)) {
             System.out.println("Not found (searched for " + email + ")");
         } else {
-            printObject(user);
+            printObject(userOpt.get());
         }
     }
 
@@ -59,8 +61,9 @@ public class UserManageState extends DomainManageState<User, UserService> {
         String firstName = readStringInput("First name: ");
         String lastName = readStringInput("Last name: ");
         String email = readStringInput("E-mail: ");
+        LocalDateTime birthDate = readDateTimeInput("Birth date: " );
 
-        User user = new User();
+        User user = service.createNew(birthDate);
         user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);

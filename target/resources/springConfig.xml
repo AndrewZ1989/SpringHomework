@@ -11,8 +11,12 @@
 
     <bean id="eventService" class="domainServices.EventServiceImpl"/>
 
-    <bean id="auditoriumService" class="domainServices.AuditoriumServiceImpl"/>
+    <bean id="auditoriumService" class="domainServices.AuditoriumServiceImpl">
+        <constructor-arg value="target/resources/auditorium.json"/>
+    </bean>
 
-    <bean id="bookingService" class="domainServices.BookingServiceImpl"/>
+    <bean id="bookingService" class="domainServices.BookingServiceImpl">
+        <constructor-arg ref="discountService"/>
+    </bean>
 
 </beans>
