@@ -39,7 +39,7 @@ public class Event extends DomainObject {
     public boolean assignAuditorium(LocalDateTime dateTime, Auditorium auditorium) {
         if (airDates.contains(dateTime)) {
             auditoriums.put(dateTime, auditorium);
-            airDates.remove(dateTime);
+            //airDates.remove(dateTime);
             return true;
         } else {
             return false;

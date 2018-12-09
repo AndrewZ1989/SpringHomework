@@ -1,6 +1,8 @@
 package domainServices;
 
 import domainModel.Event;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import repositories.EventsRepository;
 
 import javax.annotation.Nonnull;
@@ -9,11 +11,12 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
+@Component
 public class EventServiceImpl implements EventService {
 
     private EventsRepository rep;
 
+    @Autowired
     public EventServiceImpl(EventsRepository rep){
 
         this.rep = rep;

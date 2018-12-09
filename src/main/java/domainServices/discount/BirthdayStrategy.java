@@ -2,12 +2,14 @@ package domainServices.discount;
 
 import domainModel.Event;
 import domainModel.User;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Component
 public class BirthdayStrategy implements DiscountStrategy {
 
     @Override

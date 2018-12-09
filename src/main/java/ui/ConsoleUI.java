@@ -3,6 +3,7 @@ package ui;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
+import aspects.DiscountAspect;
 import org.springframework.context.ApplicationContext;
 
 import domainModel.Auditorium;
@@ -15,14 +16,16 @@ import domainServices.AuditoriumService;
 import domainServices.BookingService;
 import domainServices.EventService;
 import domainServices.UserService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import springConfig.AppConfig;
 import ui.state.InitialMenu;
 
 /**
  */
 public class ConsoleUI {
 
-    private ApplicationContext context;
+    private AnnotationConfigApplicationContext context;
 
     public static void main(String[] args) {
         ConsoleUI ui = new ConsoleUI();
@@ -31,7 +34,10 @@ public class ConsoleUI {
     }
 
     private void initContext() {
-        context = new FileSystemXmlApplicationContext("target/resources/springConfig.xml", "target/resources/discount.xml");
+        context = new AnnotationConfigApplicationContext(AppConfig.class);
+        context.scan("repositories", "domainServices", "aspects");
+
+        DiscountAspect d = context.getBean(DiscountAspect.class);
     }
 
     private void run() {
@@ -47,7 +53,7 @@ public class ConsoleUI {
     }
 
     private void fillInitialData() {
-        UserService userService = (UserService) context.getBean(UserService.class);
+        UserService userService = context.getBean(UserService.class);
         EventService eventService = context.getBean(EventService.class);
         AuditoriumService auditoriumService = context.getBean(AuditoriumService.class);
         BookingService bookingService = context.getBean(BookingService.class);

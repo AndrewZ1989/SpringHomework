@@ -1,6 +1,8 @@
 package domainServices;
 
 import domainModel.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import repositories.UsersRepository;
 
 import javax.annotation.Nonnull;
@@ -11,10 +13,12 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component
 public class UserServiceImpl implements UserService {
 
     private UsersRepository rep;
 
+    @Autowired
     public UserServiceImpl(UsersRepository rep)
     {
 

@@ -2,8 +2,12 @@ package domainServices;
 
 import domainModel.*;
 import domainServices.discount.DiscountService;
+import domainServices.discount.DiscountStrategy;
 import domainServices.discount.DiscountsForSeats;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import repositories.BookingRepository;
+import utility.Tuple;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -11,8 +15,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component
 public class BookingServiceImpl implements BookingService {
 
+    @Autowired
     public BookingServiceImpl(DiscountService discountSvc, BookingRepository rep){
         this.discountSvc = discountSvc;
         this.rep = rep;
@@ -38,11 +44,11 @@ public class BookingServiceImpl implements BookingService {
             return 0;
         }
 
-        DiscountsForSeats discounts = discountSvc.getDiscount(user, event, dateTime, seats );
+        Tuple<DiscountsForSeats, DiscountStrategy> discounts = discountSvc.getDiscount(user, event, dateTime, seats );
 
         double totalPrice = 0;
         for( Long seat : seats){
-            Double discount = discounts.getDiscountForSeat(seat);
+            Double discount = discounts.first.getDiscountForSeat(seat);
            totalPrice += getTicketPrice( event, dateTime, user, seat, discount);
         }
         return  totalPrice;

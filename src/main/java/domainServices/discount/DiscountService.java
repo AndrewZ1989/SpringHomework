@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import domainModel.Event;
 import domainModel.User;
+import utility.Tuple;
 
 /**
  * @author Yuriy_Tkach
@@ -21,6 +22,6 @@ public interface DiscountService {
      * @param seats
      * @return
      */
-    DiscountsForSeats  getDiscount(User user, @Nonnull Event event, @Nonnull LocalDateTime airDateTime, Set<Long> seats);
+    Tuple<DiscountsForSeats,DiscountStrategy> getDiscount(User user, @Nonnull Event event, @Nonnull LocalDateTime airDateTime, Set<Long> seats);
 
 }

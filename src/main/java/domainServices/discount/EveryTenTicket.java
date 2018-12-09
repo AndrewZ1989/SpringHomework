@@ -2,6 +2,7 @@ package domainServices.discount;
 
 import domainModel.Event;
 import domainModel.User;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Component
 public class EveryTenTicket implements DiscountStrategy {
 
     @Override

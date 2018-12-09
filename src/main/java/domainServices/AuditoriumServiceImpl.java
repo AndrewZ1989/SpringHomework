@@ -11,13 +11,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import repositories.AuditoriumRepository;
 
+@Component
 public class AuditoriumServiceImpl implements AuditoriumService {
 
     private AuditoriumRepository rep;
 
-    public AuditoriumServiceImpl(String configPath, AuditoriumRepository rep){
+    @Autowired
+    public AuditoriumServiceImpl(@Qualifier("auditoriumConfigPath")String configPath, AuditoriumRepository rep){
         this.rep = rep;
         loadConfig(configPath);
     }
