@@ -28,6 +28,11 @@ public class BirthdayStrategy implements DiscountStrategy {
         return discountMap(seats, 0.0);
     }
 
+    @Override
+    public String getName() {
+        return "Birthday";
+    }
+
     private DiscountsForSeats discountMap(Set<Long> seats, Double discount){
         HashMap<Long,Double> mp = new HashMap<>();
         for(Long seat : seats){

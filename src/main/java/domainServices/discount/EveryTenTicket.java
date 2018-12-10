@@ -35,4 +35,9 @@ public class EveryTenTicket implements DiscountStrategy {
             return 0;
         };
     }
+
+    @Override
+    public String getName() {
+        return "EveryTenTicket";
+    }
 }

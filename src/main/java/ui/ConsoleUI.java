@@ -36,8 +36,6 @@ public class ConsoleUI {
     private void initContext() {
         context = new AnnotationConfigApplicationContext(AppConfig.class);
         context.scan("repositories", "domainServices", "aspects");
-
-        DiscountAspect d = context.getBean(DiscountAspect.class);
     }
 
     private void run() {

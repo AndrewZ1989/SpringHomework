@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +22,10 @@ public class CounterAspect {
 
     public CounterAspect(){
         _eventsStats = new HashMap<>();
+    }
+
+    public Map<Event, EventStatistics> getStatistics(){
+        return _eventsStats;
     }
 
 
@@ -78,35 +83,3 @@ public class CounterAspect {
     }
 }
 
-class EventStatistics{
-    private Integer byNameAccessCount;
-    private Integer priceQueriedCount;
-    private Integer bookedTicketsCount;
-
-    public  EventStatistics(){
-        byNameAccessCount = 0;
-        priceQueriedCount = 0;
-        bookedTicketsCount = 0;
-    }
-
-    public Integer getByNameAccessCount(){
-        return byNameAccessCount;
-    }
-    public void setByNameAccessCount(Integer value){
-        byNameAccessCount = value;
-    }
-
-    public Integer getPriceQueriedCount() {
-        return priceQueriedCount;
-    }
-    public void setPriceQueriedCount(Integer priceQueriedCount) {
-        this.priceQueriedCount = priceQueriedCount;
-    }
-
-    public Integer getBookedTicketsCount() {
-        return bookedTicketsCount;
-    }
-    public void setBookedTicketsCount(Integer bookedTicketsCount) {
-        this.bookedTicketsCount = bookedTicketsCount;
-    }
-}

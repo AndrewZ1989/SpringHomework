@@ -106,5 +106,10 @@ public class User extends DomainObject {
         return true;
     }
 
+    @Override
+    public String toString(){
+        return this.getId() + "  " + this.firstName + ' ' + this.lastName + ": ";
+    }
+
 }
 

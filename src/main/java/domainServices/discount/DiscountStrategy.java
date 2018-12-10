@@ -12,4 +12,5 @@ public interface DiscountStrategy {
 
     DiscountsForSeats getDiscount(@Nullable User user, @Nonnull Event event, @Nonnull LocalDateTime airDateTime, Set<Long> seats);
 
+    String getName();
 }

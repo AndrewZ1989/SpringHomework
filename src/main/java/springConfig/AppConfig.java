@@ -1,7 +1,6 @@
 package springConfig;
 
-import aspects.CounterAspect;
-import aspects.DiscountAspect;
+import aspects.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -25,5 +24,8 @@ public class AppConfig {
 
     @Bean
     public CounterAspect counterAspect(){ return  new CounterAspect(); }
+
+    @Bean
+    public LuckyWinnerAspect luckyWinnerAspect(){ return  new LuckyWinnerAspect(); }
 
 }

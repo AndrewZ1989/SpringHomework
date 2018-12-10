@@ -4,6 +4,9 @@ package ui.state;
 import java.util.HashMap;
         import java.util.Map;
 
+import aspects.CounterAspect;
+import aspects.DiscountAspect;
+import aspects.LuckyWinnerAspect;
 import domainServices.AuditoriumService;
 import domainServices.BookingService;
 import domainServices.EventService;
@@ -31,6 +34,12 @@ public class InitialMenu extends AbstractMenu {
 
         childStates.put(4, new BookingManageMenu(bookingSvc, usersSvc, eventsSvc)
         );
+
+        CounterAspect counterAspect = context.getBean(CounterAspect.class);
+        DiscountAspect discountAspect = context.getBean(DiscountAspect.class);
+        LuckyWinnerAspect luckyWinnerAspect = context.getBean(LuckyWinnerAspect.class);
+
+        childStates.put(5, new AspectsMenu(counterAspect, discountAspect, luckyWinnerAspect));
     }
 
     @Override
@@ -49,7 +58,8 @@ public class InitialMenu extends AbstractMenu {
         System.out.println(" 2) Manage events");
         System.out.println(" 3) Manage users");
         System.out.println(" 4) Book tickets");
-        return 4;
+        System.out.println(" 5) Aspects");
+        return 5;
     }
 
     @Override

@@ -17,10 +17,10 @@ import java.util.Map;
 @Component
 public class DiscountAspect {
 
-    private HashMap<String, HashMap<User, Integer>> _statistics;
+    private Map<String, HashMap<User, Integer>> statistics;
 
     public DiscountAspect(){
-        _statistics = new HashMap<>();
+        statistics = new HashMap<>();
     }
 
     @AfterReturning(pointcut = "execution(* domainServices.discount.DiscountService.getDiscount(..))", returning = "retVal")
@@ -29,13 +29,13 @@ public class DiscountAspect {
         Tuple<DiscountsForSeats, DiscountStrategy> s = (Tuple<DiscountsForSeats, DiscountStrategy>) retVal;
         DiscountStrategy st = s.second;
 
-        String strategyClassName = st.getClass().getName();
+        String strategyClassName = st.getName();
 
-        if(!_statistics.containsKey(strategyClassName)){
-            _statistics.put(strategyClassName, new HashMap<>());
+        if(!statistics.containsKey(strategyClassName)){
+            statistics.put(strategyClassName, new HashMap<>());
         }
 
-        HashMap<User, Integer> strategyStatistic = _statistics.get(strategyClassName);
+        HashMap<User, Integer> strategyStatistic = statistics.get(strategyClassName);
 
         Object userObj = p.getArgs()[0];
         if(userObj == null){
@@ -54,7 +54,9 @@ public class DiscountAspect {
         strategyStatistic.put(user, value);
     }
 
-
+    public Map<String, HashMap<User, Integer>> getStatistics(){
+        return statistics;
+    }
 
 
 }
