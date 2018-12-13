@@ -10,7 +10,6 @@ import domainModel.User;
 import utility.Tuple;
 
 /**
- * @author Yuriy_Tkach
  */
 public interface DiscountService {
 

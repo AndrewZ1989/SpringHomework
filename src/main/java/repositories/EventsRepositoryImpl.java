@@ -8,7 +8,7 @@ public class EventsRepositoryImpl extends RepositoryImpl<Event> implements Event
 
     @Override
     public Event create() {
-        long id = _objCount.addAndGet(1);
+        long id = objCount.addAndGet(1);
         return new Event(id);
     }
 

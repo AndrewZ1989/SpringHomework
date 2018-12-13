@@ -8,10 +8,10 @@ import java.util.TreeSet;
 
 public class User extends DomainObject {
 
-    public User(Long id, LocalDateTime _birthDate)
+    public User(Long id, LocalDateTime birthDate)
     {
         super(id);
-        birthDate = _birthDate;
+        this.birthDate = birthDate;
     }
 
     private String firstName;

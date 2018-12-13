@@ -3,17 +3,17 @@ package domainModel;
 public class DomainObject {
 
     public DomainObject(Long id){
-        _id = id;
+        this.id = id;
     }
 
-    private Long _id;
+    private Long id;
 
     public Long getId() {
-        return _id;
+        return id;
     }
 
     public void setId(Long id) {
-        this._id = id;
+        this.id = id;
     }
 
 }

@@ -18,10 +18,10 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Autowired
     public DiscountServiceImpl(Collection<DiscountStrategy> strategies){
-        _strategies = strategies;
+        this.strategies = strategies;
     }
 
-    private Collection<DiscountStrategy> _strategies;
+    private Collection<DiscountStrategy> strategies;
 
 
     @Override
@@ -31,7 +31,8 @@ public class DiscountServiceImpl implements DiscountService {
         double price = -1;
         DiscountStrategy st = null;
 
-        for(DiscountStrategy strategy : _strategies){
+        for(DiscountStrategy strategy : strategies){
+
             DiscountsForSeats currentDiscounts = strategy.getDiscount(user, event, airDateTime, seats);
 
             if(price < 0){

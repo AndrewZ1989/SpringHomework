@@ -7,8 +7,6 @@ import domainServices.AuditoriumService;
 
 /**
  * State for managing auditoriums
- *
- * @author Yuriy_Tkach
  */
 public class AuditoriumManageMenu extends AbstractMenu {
 

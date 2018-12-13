@@ -13,8 +13,6 @@ import domainServices.EventService;
 
 /**
  * State for managing events
- *
- * @author Yuriy_Tkach
  */
 public class EventsManageMenu extends DomainManageMenu<Event, EventService> {
 

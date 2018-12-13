@@ -18,14 +18,14 @@ import java.util.Set;
 @Component
 public class CounterAspect {
 
-    private HashMap<Event, EventStatistics> _eventsStats;
+    private HashMap<Event, EventStatistics> eventStats;
 
     public CounterAspect(){
-        _eventsStats = new HashMap<>();
+        eventStats = new HashMap<>();
     }
 
     public Map<Event, EventStatistics> getStatistics(){
-        return _eventsStats;
+        return eventStats;
     }
 
 
@@ -76,10 +76,10 @@ public class CounterAspect {
 
 
     private EventStatistics getStatsFor(Event e){
-        if(!_eventsStats.containsKey(e)){
-            _eventsStats.put(e, new EventStatistics());
+        if(!eventStats.containsKey(e)){
+            eventStats.put(e, new EventStatistics());
         }
-        return _eventsStats.get(e);
+        return eventStats.get(e);
     }
 }
 
