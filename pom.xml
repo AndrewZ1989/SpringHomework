@@ -16,6 +16,7 @@
         <findbugs.version>3.0.1</findbugs.version>
         <junit.version>4.12</junit.version>
         <aspectj.version>1.6.11</aspectj.version>
+        <derby.version>10.11.1.1</derby.version>
     </properties>
 
     <build>
@@ -114,6 +115,18 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${aspectj.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>${derby.version}</version>
         </dependency>
 
     </dependencies>

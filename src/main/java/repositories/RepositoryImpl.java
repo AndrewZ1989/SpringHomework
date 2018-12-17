@@ -35,6 +35,7 @@ public abstract class RepositoryImpl<T extends DomainObject> implements Reposito
 
     @Override
     public void remove(T e) {
+
         storage.remove(e);
     }
 

@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -27,5 +30,16 @@ public class AppConfig {
 
     @Bean
     public LuckyWinnerAspect luckyWinnerAspect(){ return  new LuckyWinnerAspect(); }
+
+    @Bean
+    public DataSource dataSource(){
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+        dataSource.setUrl("jdbc:derby:\\database\\db;create=true");
+        dataSource.setUsername("");
+        dataSource.setPassword("");
+
+        return dataSource;
+    }
 
 }
