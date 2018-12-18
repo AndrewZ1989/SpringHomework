@@ -1,5 +1,6 @@
 package aspects;
 
+import aspectsRepositories.DiscountAspectRepository;
 import domainModel.User;
 import domainServices.discount.BirthdayStrategy;
 import domainServices.discount.DiscountStrategy;
@@ -7,20 +8,25 @@ import domainServices.discount.DiscountsForSeats;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
+import repositories.UsersRepository;
 import utility.Tuple;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Aspect
 @Component
 public class DiscountAspect {
 
-    private Map<String, HashMap<User, Integer>> statistics;
+    private DiscountAspectRepository rep;
+    private UsersRepository userRep;
 
-    public DiscountAspect(){
-        statistics = new HashMap<>();
+    public DiscountAspect(DiscountAspectRepository rep,
+                          UsersRepository userRep){
+        this.rep = rep;
+        this.userRep = userRep;
     }
 
     @AfterReturning(pointcut = "execution(* domainServices.discount.DiscountService.getDiscount(..))", returning = "retVal")
@@ -31,11 +37,7 @@ public class DiscountAspect {
 
         String strategyClassName = st.getName();
 
-        if(!statistics.containsKey(strategyClassName)){
-            statistics.put(strategyClassName, new HashMap<>());
-        }
-
-        HashMap<User, Integer> strategyStatistic = statistics.get(strategyClassName);
+        Optional<HashMap<Long, Integer>> strategyStatistic = rep.getFor(strategyClassName);
 
         Object userObj = p.getArgs()[0];
         if(userObj == null){
@@ -44,18 +46,33 @@ public class DiscountAspect {
 
         User user = (User)userObj;
 
-        if(!strategyStatistic.containsKey(user)){
-            strategyStatistic.put(user, 0);
+        Integer currentCount = 0;
+        if(strategyStatistic.isPresent() && strategyStatistic.get().containsKey(user.getId())){
+            currentCount = strategyStatistic.get().get(user.getId());
         }
 
-        Integer value = strategyStatistic.get(user);
-        value += 1;
-
-        strategyStatistic.put(user, value);
+        rep.save(strategyClassName, user.getId(), currentCount + 1);
     }
 
-    public Map<String, HashMap<User, Integer>> getStatistics(){
-        return statistics;
+    public Map<String, HashMap<User, Integer>> getStatistics()
+    {
+        Map<String, HashMap<Long, Integer>> userStats = rep.getAll();
+
+        Map<String, HashMap<User, Integer>> ans = new HashMap<>();
+        for(Map.Entry<String, HashMap<Long, Integer>> s : userStats.entrySet() ){
+
+            HashMap<User, Integer> m = new HashMap<>();
+            for(Map.Entry<Long, Integer> e : s.getValue().entrySet()){
+                Long userId = e.getKey();
+                Optional<User> usr = userRep.tryGetFirst(u -> u.getId().equals(userId));
+                if(usr.isPresent()){
+                    m.put(usr.get(), e.getValue());
+                }
+            }
+
+            ans.put(s.getKey(), m);
+        }
+        return ans;
     }
 
 

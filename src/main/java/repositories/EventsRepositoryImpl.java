@@ -1,9 +1,7 @@
 package repositories;
 
 import domainModel.Event;
-import org.springframework.stereotype.Component;
 
-@Component
 public class EventsRepositoryImpl extends RepositoryImpl<Event> implements EventsRepository {
 
     @Override

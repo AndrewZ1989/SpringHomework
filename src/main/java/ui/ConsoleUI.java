@@ -35,7 +35,7 @@ public class ConsoleUI {
 
     private void initContext() {
         context = new AnnotationConfigApplicationContext(AppConfig.class);
-        context.scan("repositories", "domainServices", "aspects");
+        context.scan("aspects", "repositories", "domainServices", "aspectsRepositories");
     }
 
     private void run() {

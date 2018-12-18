@@ -21,13 +21,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Component
 public class AuditoriumRepositoryDbImpl extends DbRepositoryImpl<Auditorium> implements AuditoriumRepository {
 
     private volatile AtomicLong auditoriumsCount = new AtomicLong(0);
 
-    @Autowired
-    public AuditoriumRepositoryDbImpl(@Qualifier("dataSource")DataSource source) throws SQLException {
+    public AuditoriumRepositoryDbImpl(DataSource source) throws SQLException {
         super(source);
         auditoriumsCount.set(getMaxId());
     }
@@ -39,36 +37,34 @@ public class AuditoriumRepositoryDbImpl extends DbRepositoryImpl<Auditorium> imp
 
     @Override
     public Collection<Auditorium> getAll() {
-        List<Auditorium> all = template.query("SELECT id, name, number_of_seats, vip_seats FROM Auditoriums", new ResultSetExtractor<List<Auditorium>>() {
-            @Override
-            public List<Auditorium> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                List<Auditorium> data = new ArrayList<>();
+        List<Auditorium> all = template.query("SELECT id, name, number_of_seats, vip_seats FROM Auditoriums",
+                resultSet -> {
+                    List<Auditorium> data = new ArrayList<>();
 
-                while (resultSet.next()){
-                    Long id = resultSet.getLong("id");
-                    String name = resultSet.getString("name");
-                    int number_of_seats = resultSet.getInt("number_of_seats");
-                    String vip_seats = resultSet.getString("vip_seats");
+                    while (resultSet.next()){
+                        Long id = resultSet.getLong("id");
+                        String name = resultSet.getString("name");
+                        int number_of_seats = resultSet.getInt("number_of_seats");
+                        String vip_seats = resultSet.getString("vip_seats");
 
-                    HashSet<Long> vipSeats = new HashSet<>();
-                    for(String vipSeat : Splitter.on(",").split(vip_seats)){
-                        Long l = Longs.tryParse(vipSeat);
-                        if( l != null){
-                            vipSeats.add(l);
+                        HashSet<Long> vipSeats = new HashSet<>();
+                        for(String vipSeat : Splitter.on(",").split(vip_seats)){
+                            Long l = Longs.tryParse(vipSeat);
+                            if( l != null){
+                                vipSeats.add(l);
+                            }
                         }
+
+                        Auditorium a = new Auditorium(id);
+                        a.setVipSeats(vipSeats);
+                        a.setNumberOfSeats(number_of_seats);
+                        a.setName(name);
+
+                        data.add(a);
                     }
 
-                    Auditorium a = new Auditorium(id);
-                    a.setVipSeats(vipSeats);
-                    a.setNumberOfSeats(number_of_seats);
-                    a.setName(name);
-
-                    data.add(a);
-                }
-
-                return data;
-            }
-        });
+                    return data;
+                });
         return all;
     }
 

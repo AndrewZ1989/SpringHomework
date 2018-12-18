@@ -1,12 +1,15 @@
 package aspects;
 
+import aspectsRepositories.CounterAspectRepository;
 import domainModel.Event;
 import domainModel.Ticket;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import repositories.EventsRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +21,30 @@ import java.util.Set;
 @Component
 public class CounterAspect {
 
-    private HashMap<Event, EventStatistics> eventStats;
+    private CounterAspectRepository repository;
+    private EventsRepository eventRep;
 
-    public CounterAspect(){
-        eventStats = new HashMap<>();
+    @Autowired
+    public CounterAspect(CounterAspectRepository repository,
+                         EventsRepository eventRep){
+        this.repository = repository;
+        this.eventRep = eventRep;
     }
 
     public Map<Event, EventStatistics> getStatistics(){
-        return eventStats;
+        Map<Long, EventStatistics> stat = repository.getAll();
+        Map<Event, EventStatistics> res = new HashMap<>();
+
+        for(Map.Entry<Long, EventStatistics> entry : stat.entrySet()){
+            Long key = entry.getKey();
+            Optional<Event> evt = eventRep.tryGetFirst(e -> e.getId() == key);
+
+            if(evt.isPresent()){
+                res.put(evt.get(), entry.getValue());
+            }
+        }
+
+        return res;
     }
 
 
@@ -43,6 +62,8 @@ public class CounterAspect {
         Event e = eOpt.get();
         EventStatistics stat = getStatsFor(e);
         stat.setByNameAccessCount(stat.getByNameAccessCount() + 1);
+
+        saveStatsFor(e, stat);
     }
 
     @Before("execution(* domainServices.BookingService.getTicketsPrice(..))")
@@ -55,6 +76,8 @@ public class CounterAspect {
         Event e = (Event)eventArg;
         EventStatistics stat = getStatsFor(e);
         stat.setPriceQueriedCount(stat.getPriceQueriedCount() + 1);
+
+        saveStatsFor(e, stat);
     }
 
     @Before("execution(* domainServices.BookingService.bookTickets(..))")
@@ -69,17 +92,22 @@ public class CounterAspect {
         for(Ticket t: tickets){
             Event e = t.getEvent();
             EventStatistics es = getStatsFor(e);
-
             es.setBookedTicketsCount( es.getBookedTicketsCount() + 1);
+
+            saveStatsFor(e, es);
         }
     }
 
 
     private EventStatistics getStatsFor(Event e){
-        if(!eventStats.containsKey(e)){
-            eventStats.put(e, new EventStatistics());
+        if(!repository.hasDataFor(e)){
+            return new EventStatistics();
         }
-        return eventStats.get(e);
+        return repository.getFor(e);
+    }
+
+    private void saveStatsFor(Event e, EventStatistics stats){
+        repository.save(e, stats);
     }
 }
 
