@@ -1,10 +1,7 @@
 package springConfig;
 
 import aspects.*;
-import aspectsRepositories.CounterAspectRepository;
-import aspectsRepositories.CounterAspectRepositoryDb;
-import aspectsRepositories.DiscountAspectRepository;
-import aspectsRepositories.DiscountAspectRepositoryDb;
+import aspectsRepositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,8 +24,8 @@ public class AppConfig {
     }
 
     @Bean
-    public UsersRepository usersRepository(){
-        return new UsersRepositoryImpl();
+    public UsersRepository usersRepository(DataSource ds){
+        return new UsersRepositoryDbImpl(ds);
     }
 
     @Bean
@@ -42,12 +39,17 @@ public class AppConfig {
     }
 
     @Bean
+    public LuckyWinnerRepository luckyWinnerRepository(DataSource ds){
+        return new LuckyWinnerRepositoryDb(ds);
+    }
+
+    @Bean
     public DiscountAspectRepository discountAspectRepository(DataSource ds){
         return new DiscountAspectRepositoryDb(ds);
     }
 
     @Bean
-    public BookingRepository bookingRepository(){
+    public BookingRepository bookingRepository() {
         return new BookingRepositoryImpl();
     }
 
@@ -70,8 +72,8 @@ public class AppConfig {
     }
 
     @Bean
-    public LuckyWinnerAspect luckyWinnerAspect(){
-        return  new LuckyWinnerAspect(); }
+    public LuckyWinnerAspect luckyWinnerAspect(LuckyWinnerRepository rep, UsersRepository uRep){
+        return  new LuckyWinnerAspect(rep, uRep); }
 
     @Bean
     public DataSource dataSource(){

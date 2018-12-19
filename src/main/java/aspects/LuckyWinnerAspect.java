@@ -1,11 +1,13 @@
 package aspects;
 
+import aspectsRepositories.LuckyWinnerRepository;
 import domainModel.Ticket;
 import domainModel.User;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import repositories.UsersRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,15 +17,29 @@ import java.util.stream.Collectors;
 public class LuckyWinnerAspect {
 
     private Random rand;
-    private Map<User,Integer> statistics;
+    //private Map<User,Integer> statistics;
+    private LuckyWinnerRepository rep;
+    private UsersRepository userRep;
 
-    public LuckyWinnerAspect(){
+    public LuckyWinnerAspect(LuckyWinnerRepository rep,
+                             UsersRepository userRep){
+        this.rep = rep;
+        this.userRep = userRep;
         rand = new Random();
-        statistics = new HashMap<>();
     }
 
     public Map<User,Integer> getStatistics(){
-        return statistics;
+        Map<Long,Integer> userInfo = rep.getAll();
+
+        Map<User,Integer> res = new HashMap<>();
+        for(Map.Entry<Long,Integer> e : userInfo.entrySet()){
+            Long userId = e.getKey();
+            Optional<User> usr = userRep.tryGetFirst(u -> u.getId().equals(userId));
+            if(usr.isPresent()){
+                res.put(usr.get(), e.getValue());
+            }
+        }
+        return res;
     }
 
     @Around("execution(* domainServices.BookingService.bookTickets(..))")
@@ -45,10 +61,12 @@ public class LuckyWinnerAspect {
        for(User u : uniqueUsers){
            int rnd = rand.nextInt();
            if( rnd % 2 == 0) {
-               if(!statistics.containsKey(u)){
-                   statistics.put(u, 0);
+
+               int count = 0;
+               if(rep.containsFor(u.getId())){
+                   count = rep.getFor(u.getId());
                }
-               statistics.put(u, statistics.get(u) + 1);
+               rep.save(u.getId(), count + 1);
            }
        }
     }
