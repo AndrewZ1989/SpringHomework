@@ -7,6 +7,7 @@ import domainServices.discount.DiscountsForSeats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import repositories.BookingRepository;
+import repositories.UsersRepository;
 import utility.Tuple;
 
 import javax.annotation.Nonnull;
@@ -19,9 +20,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BookingServiceImpl implements BookingService {
 
     @Autowired
-    public BookingServiceImpl(DiscountService discountSvc, BookingRepository rep){
+    public BookingServiceImpl(DiscountService discountSvc,
+                              BookingRepository rep,
+                              UsersRepository uRep){
         this.discountSvc = discountSvc;
         this.rep = rep;
+        this.uRep = uRep;
     }
 
 
@@ -30,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
 
     private DiscountService discountSvc;
     private BookingRepository rep;
+    private UsersRepository uRep;
 
     @Override
     public Ticket createTicket(User user, Event event, LocalDateTime dateTime, long seat) {
@@ -81,8 +86,9 @@ public class BookingServiceImpl implements BookingService {
     }
     private void bookTicket(Ticket t) {
         User u = t.getUser();
-        u.getTickets().add(t);
+        u.getTicketsIds().add(t.getId());
         rep.save(t);
+        uRep.save(u);
     }
 
     @Nonnull

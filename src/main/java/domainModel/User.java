@@ -3,7 +3,9 @@ package domainModel;
 import java.time.LocalDateTime;
 import java.util.NavigableSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 
 public class User extends DomainObject {
@@ -22,7 +24,7 @@ public class User extends DomainObject {
 
     private LocalDateTime birthDate;
 
-    private NavigableSet<Ticket> tickets = new TreeSet<>();
+    private Set<Long> ticketsIds = new TreeSet<>();
 
 
     public LocalDateTime getBirthDate() {
@@ -57,12 +59,16 @@ public class User extends DomainObject {
         this.email = email;
     }
 
-    public NavigableSet<Ticket> getTickets() {
-        return tickets;
+    public Set<Long> getTicketsIds() {
+        return ticketsIds;
     }
 
-    public void setTickets(NavigableSet<Ticket> tickets) {
-        this.tickets = tickets;
+    public void setTickets(Set<Ticket> tickets) {
+        this.ticketsIds = tickets.stream().map(t -> t.getId()).collect(Collectors.toSet());
+    }
+
+    public void setTicketsIds(Set<Long> ticketsIds) {
+        this.ticketsIds = ticketsIds;
     }
 
     @Override

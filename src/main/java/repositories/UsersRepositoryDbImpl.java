@@ -3,9 +3,12 @@ package repositories;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.primitives.Longs;
+import domainModel.Ticket;
 import domainModel.User;
 
 import javax.sql.DataSource;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,7 +35,7 @@ public class UsersRepositoryDbImpl extends DbRepositoryImpl<User> implements Use
                         String firstName = resultSet.getString("firstName");
                         String lastName = resultSet.getString("lastName");
                         String email = resultSet.getString("email");
-                        Date birthDate = resultSet.getDate("birthDate");
+                        Timestamp birthDate = resultSet.getTimestamp("birthDate");
                         String tickets = resultSet.getString("tickets");
 
                         HashSet<Long> ticketsIds = new HashSet<>();
@@ -43,10 +46,11 @@ public class UsersRepositoryDbImpl extends DbRepositoryImpl<User> implements Use
                             }
                         }
 
-                        User a = new User(id, null);
+                        User a = new User(id, birthDate.toLocalDateTime());
                         a.setFirstName(firstName);
                         a.setLastName(lastName);
                         a.setEmail(email);
+                        a.setTicketsIds(ticketsIds);
 
                         data.add(a);
                     }
@@ -68,10 +72,10 @@ public class UsersRepositoryDbImpl extends DbRepositoryImpl<User> implements Use
                 "SELECT count(*) FROM Users WHERE id = ?", Integer.class, e.getId());
         boolean exists = cnt != null && cnt > 0;
 
-        List<String> ticketsIds = e.getTickets().stream().map(t -> t.getId().toString()).collect(Collectors.toList());
+        List<String> ticketsIds = e.getTicketsIds().stream().map(t -> t.toString()).collect(Collectors.toList());
         String ticketsIdsString = Joiner.on(',').join(ticketsIds);
 
-        Date birthDateToSave = java.sql.Timestamp.valueOf(e.getBirthDate());
+        java.sql.Timestamp birthDateToSave = java.sql.Timestamp.valueOf(e.getBirthDate());
 
         if(exists){
             String updateSql = "UPDATE Users SET firstName = ?, lastName = ?, email = ?, birthDate = ?, tickets = ? WHERE id = ?";
@@ -89,12 +93,12 @@ public class UsersRepositoryDbImpl extends DbRepositoryImpl<User> implements Use
                 "    firstName VARCHAR(45) NOT NULL," +
                 "    lastName VARCHAR(45) NOT NULL," +
                 "    email VARCHAR(45) NOT NULL," +
-                "    birthDate DATE NOT NULL," +
+                "    birthDate TIMESTAMP NOT NULL," +
                 "    tickets VARCHAR(500))";
     }
 
     @Override
-    public User createNew(LocalDate birthDate) {
+    public User createNew(LocalDateTime birthDate) {
         return new User(auditoriumsCount.addAndGet(1), birthDate);
     }
 

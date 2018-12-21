@@ -52,7 +52,7 @@ public class UserManageMenu extends DomainManageMenu<User, UserService> {
     @Override
     protected void printObject(User user) {
         System.out.println("[" + user.getId() + "] " + user.getFirstName() + " " + user.getLastName() + ", "
-                + user.getEmail() + ", bought " + user.getTickets().size() + " tickets");
+                + user.getEmail() + ", bought " + user.getTicketsIds().size() + " tickets");
     }
 
     @Override

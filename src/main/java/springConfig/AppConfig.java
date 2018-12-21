@@ -49,8 +49,8 @@ public class AppConfig {
     }
 
     @Bean
-    public BookingRepository bookingRepository() {
-        return new BookingRepositoryImpl();
+    public BookingRepository bookingRepository(DataSource ds, UsersRepository uRep, EventsRepository eRep) {
+        return new BookingRepositoryDbImpl(ds, uRep, eRep);
     }
 
 
