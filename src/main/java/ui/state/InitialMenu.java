@@ -32,7 +32,7 @@ public class InitialMenu extends AbstractMenu {
         );
         childStates.put(3, new UserManageMenu(usersSvc));
 
-        childStates.put(4, new BookingManageMenu(bookingSvc, usersSvc, eventsSvc)
+        childStates.put(4, new BookingManageMenu(bookingSvc, usersSvc, eventsSvc, auditoriumSvc)
         );
 
         CounterAspect counterAspect = context.getBean(CounterAspect.class);

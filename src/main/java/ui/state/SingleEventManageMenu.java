@@ -1,10 +1,13 @@
 package ui.state;
 
 import java.time.LocalDateTime;
-        import java.util.List;
-        import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-        import domainModel.Auditorium;
+import domainModel.Auditorium;
         import domainModel.Event;
 
         import domainServices.AuditoriumService;
@@ -85,8 +88,19 @@ public class SingleEventManageMenu extends AbstractMenu {
 
     private void viewAssignedAuditoriums() {
         System.out.println("Event airs in: ");
-        event.getAuditoriums().entrySet()
-                .forEach(e -> System.out.println(formatDateTime(e.getKey()) + " " + e.getValue().getName()));
+
+        Stream<Auditorium> allAuditoriums = auditoriumService.getAll().stream();
+
+
+        List<Optional<Auditorium>> eventAuds = event.getAuditoriumsIds().entrySet().stream()
+                .map(id -> allAuditoriums.filter(a -> a.getId().equals(id)).findFirst())
+                .collect(Collectors.toList());
+
+        for(Optional<Auditorium> a : eventAuds){
+            if(a.isPresent()){
+                System.out.println(a.get().getName());
+            }
+        }
     }
 
     private void addAirDate() {

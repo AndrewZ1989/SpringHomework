@@ -87,14 +87,14 @@ public class UsersRepositoryDbImpl extends DbRepositoryImpl<User> implements Use
     }
 
     @Override
-    protected String getCreateTableSqlStatement() {
-        return "CREATE TABLE Users (" +
+    protected List<String> getCreateTableSqlStatements() {
+        return Collections.singletonList("CREATE TABLE Users (" +
                 "    id INTEGER NOT NULL PRIMARY KEY," +
                 "    firstName VARCHAR(45) NOT NULL," +
                 "    lastName VARCHAR(45) NOT NULL," +
                 "    email VARCHAR(45) NOT NULL," +
                 "    birthDate TIMESTAMP NOT NULL," +
-                "    tickets VARCHAR(500))";
+                "    tickets VARCHAR(500))");
     }
 
     @Override

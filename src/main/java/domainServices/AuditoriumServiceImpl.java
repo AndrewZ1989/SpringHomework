@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.io.*;
+
+import exceptions.ApplicationException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,7 +37,11 @@ public class AuditoriumServiceImpl implements AuditoriumService {
 
     @Override
     public void add(Auditorium auditorium) {
-        rep.save(auditorium);
+        try {
+            rep.save(auditorium);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Nonnull
@@ -92,7 +98,11 @@ public class AuditoriumServiceImpl implements AuditoriumService {
         aud.setNumberOfSeats(numberOfSeats);
         aud.setVipSeats(vipSeats);
 
-        rep.save(aud);
+        try {
+            rep.save(aud);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
     }
 
 

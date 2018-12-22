@@ -1,6 +1,7 @@
 package domainServices;
 
 import domainModel.Event;
+import exceptions.ApplicationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import repositories.EventsRepository;
@@ -39,7 +40,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void save(@Nonnull Event object) {
-        rep.save(object);
+        try {
+            rep.save(object);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

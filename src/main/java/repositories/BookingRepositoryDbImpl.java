@@ -86,13 +86,13 @@ public class BookingRepositoryDbImpl extends DbRepositoryImpl<Ticket> implements
     }
 
     @Override
-    protected String getCreateTableSqlStatement() {
-        return "CREATE TABLE Tickets (" +
+    protected List<String> getCreateTableSqlStatements() {
+        return Collections.singletonList("CREATE TABLE Tickets (" +
                 "    id INTEGER NOT NULL PRIMARY KEY," +
                 "    userId INTEGER NOT NULL," +
                 "    eventId INTEGER NOT NULL," +
                 "    dateTime TIMESTAMP NOT NULL," +
-                "    seat INTEGER NOT NULL)";
+                "    seat INTEGER NOT NULL)");
     }
 
 

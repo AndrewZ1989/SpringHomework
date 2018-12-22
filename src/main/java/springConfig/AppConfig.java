@@ -19,8 +19,8 @@ import java.sql.SQLException;
 public class AppConfig {
 
     @Bean
-    public EventsRepository eventsRepository(){
-        return new EventsRepositoryImpl();
+    public EventsRepository eventsRepository(DataSource ds){
+        return new EventsRepositoryDbImpl(ds);
     }
 
     @Bean

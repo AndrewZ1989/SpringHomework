@@ -10,10 +10,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class AuditoriumRepositoryDbImpl extends DbRepositoryImpl<Auditorium> implements AuditoriumRepository {
@@ -89,23 +86,20 @@ public class AuditoriumRepositoryDbImpl extends DbRepositoryImpl<Auditorium> imp
     }
 
     @Override
-    protected String getCreateTableSqlStatement() {
-        return "CREATE TABLE Auditoriums (" +
+    protected List<String> getCreateTableSqlStatements() {
+        return Collections.singletonList("CREATE TABLE Auditoriums (" +
                 "    id INTEGER NOT NULL PRIMARY KEY," +
                 "    name VARCHAR(45) NOT NULL," +
                 "    number_of_seats INTEGER NOT NULL," +
-                "    vip_seats VARCHAR(500))";
+                "    vip_seats VARCHAR(500))");
     }
 
 
     private long getMaxId() {
         String sql = "SELECT MAX(id) as id FROM Auditoriums";
-        return  template.query(sql, new ResultSetExtractor<Long>() {
-            @Override
-            public Long extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                resultSet.next();
-                return resultSet.getLong("id");
-            }
+        return  template.query(sql, resultSet -> {
+            resultSet.next();
+            return resultSet.getLong("id");
         });
     }
 }

@@ -1,12 +1,14 @@
 package repositories;
 
 import domainModel.DomainObject;
+import exceptions.ApplicationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -39,14 +41,16 @@ public abstract class DbRepositoryImpl<T extends DomainObject> implements Reposi
     public abstract void remove(T e);
 
     @Override
-    public abstract void save(T e);
+    public abstract void save(T e) throws ApplicationException;
 
 
 
     private void createTableIfNotExists() {
-        String sql = getCreateTableSqlStatement();
+        List<String> sqlStatements = getCreateTableSqlStatements();
         try {
-            template.execute(sql);
+            for(String sql : sqlStatements){
+                template.execute(sql);
+            }
         }catch (DataIntegrityViolationException ex){
             Throwable cause = ex.getCause();
             if(cause != null && cause instanceof SQLException){
@@ -59,5 +63,5 @@ public abstract class DbRepositoryImpl<T extends DomainObject> implements Reposi
         }
     }
 
-    protected abstract String getCreateTableSqlStatement();
+    protected abstract List<String> getCreateTableSqlStatements();
 }

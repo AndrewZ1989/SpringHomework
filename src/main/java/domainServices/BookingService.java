@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import domainModel.Event;
 import domainModel.Ticket;
 import domainModel.User;
+import exceptions.ApplicationException;
 
 /**
  */
@@ -32,7 +33,7 @@ public interface BookingService {
      * @return total price
      */
     double getTicketsPrice(@Nonnull Event event, @Nonnull LocalDateTime dateTime, @Nullable User user,
-                                  @Nonnull Set<Long> seats);
+                                  @Nonnull Set<Long> seats) throws ApplicationException;
 
     /**
      * Books tickets in internal system. If user is not

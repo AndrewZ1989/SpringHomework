@@ -1,6 +1,7 @@
 package domainServices;
 
 import domainModel.User;
+import exceptions.ApplicationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import repositories.UsersRepository;
@@ -41,7 +42,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(@Nonnull User object)
     {
-        rep.save(object);
+        try {
+            rep.save(object);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package repositories;
 
 import domainModel.DomainObject;
+import exceptions.ApplicationException;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -16,5 +17,5 @@ public interface Repository<T extends DomainObject> {
 
     void remove(T e);
 
-    void save(T e);
+    void save(T e) throws ApplicationException;
 }

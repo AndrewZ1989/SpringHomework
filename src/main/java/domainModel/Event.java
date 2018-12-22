@@ -2,11 +2,7 @@ package domainModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 
 public class Event extends DomainObject {
@@ -17,13 +13,13 @@ public class Event extends DomainObject {
 
     private String name;
 
-    private NavigableSet<LocalDateTime> airDates = new TreeSet<>();
+    private Set<LocalDateTime> airDates = new TreeSet<>();
 
     private double basePrice;
 
     private EventRating rating;
 
-    private NavigableMap<LocalDateTime, Auditorium> auditoriums = new TreeMap<>();
+    private Map<LocalDateTime, Long> auditoriums = new TreeMap<>();
 
     /**
      * Checks if event is aired on particular <code>dateTime</code> and assigns
@@ -38,7 +34,7 @@ public class Event extends DomainObject {
      */
     public boolean assignAuditorium(LocalDateTime dateTime, Auditorium auditorium) {
         if (airDates.contains(dateTime)) {
-            auditoriums.put(dateTime, auditorium);
+            auditoriums.put(dateTime, auditorium.getId());
             //airDates.remove(dateTime);
             return true;
         } else {
@@ -83,7 +79,7 @@ public class Event extends DomainObject {
     public boolean addAirDateTime(LocalDateTime dateTime, Auditorium auditorium) {
         boolean result = airDates.add(dateTime);
         if (result) {
-            auditoriums.put(dateTime, auditorium);
+            auditoriums.put(dateTime, auditorium.getId());
         }
         return result;
     }
@@ -149,11 +145,11 @@ public class Event extends DomainObject {
         this.name = name;
     }
 
-    public NavigableSet<LocalDateTime> getAirDates() {
+    public Set<LocalDateTime> getAirDates() {
         return airDates;
     }
 
-    public void setAirDates(NavigableSet<LocalDateTime> airDates) {
+    public void setAirDates(Set<LocalDateTime> airDates) {
 
         this.airDates = airDates;
     }
@@ -174,12 +170,19 @@ public class Event extends DomainObject {
         this.rating = rating;
     }
 
-    public NavigableMap<LocalDateTime, Auditorium> getAuditoriums() {
+    public Map<LocalDateTime, Long> getAuditoriumsIds() {
         return auditoriums;
     }
 
-    public void setAuditoriums(NavigableMap<LocalDateTime, Auditorium> auditoriums) {
+    public void setAuditoriums(Map<LocalDateTime, Auditorium> auditoriums) {
+        Map<LocalDateTime,Long> data = new HashMap<>();
+        for(Map.Entry<LocalDateTime,Auditorium> e : auditoriums.entrySet()){
+            data.put(e.getKey(), e.getValue().getId());
+        }
+        this.auditoriums = data;
+    }
 
+    public void setAuditoriumsIds(Map<LocalDateTime, Long> auditoriums) {
         this.auditoriums = auditoriums;
     }
 

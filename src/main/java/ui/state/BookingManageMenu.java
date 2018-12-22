@@ -12,23 +12,24 @@ import domainModel.Auditorium;
         import domainModel.Ticket;
         import domainModel.User;
 
-        import domainServices.AbstractDomainObjectService;
-        import domainServices.BookingService;
-        import domainServices.EventService;
-        import domainServices.UserService;
+import domainServices.*;
+import exceptions.ApplicationException;
 
 public class BookingManageMenu extends AbstractMenu {
 
     private final BookingService bookingService;
     private final UserService userService;
     private final EventService eventService;
+    private final AuditoriumService audService;
 
     public BookingManageMenu(BookingService bookingSvc,
                              UserService userSvc,
-                             EventService eventSvc) {
+                             EventService eventSvc,
+                             AuditoriumService audService) {
         this.bookingService = bookingSvc;
         this.userService = userSvc;
         this.eventService = eventSvc;
+        this.audService = audService;
     }
 
     @Override
@@ -92,7 +93,13 @@ public class BookingManageMenu extends AbstractMenu {
         System.out.println("> Select air dates: ");
         final LocalDateTime airDate = selectAirDate(event.getAirDates());
         System.out.println("> Select seats: ");
-        final Set<Long> seats = selectSeats(event, airDate);
+        final Set<Long> seats;
+        try {
+            seats = selectSeats(event, airDate);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+            return;
+        }
         System.out.println("> Select user: ");
         final User userForBooking;
 
@@ -114,7 +121,12 @@ public class BookingManageMenu extends AbstractMenu {
 
         Set<Ticket> ticketsToBook = seats.stream().map(seat -> bookingService.createTicket(userForBooking, event, airDate, seat)).collect(Collectors.toSet());
         bookingService.bookTickets(ticketsToBook);
-        double price = bookingService.getTicketsPrice(event, airDate, userOpt.get(), seats);
+        double price = 0;
+        try {
+            price = bookingService.getTicketsPrice(event, airDate, userOpt.get(), seats);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("Tickets booked! Total price: " + price);
     }
@@ -132,7 +144,13 @@ public class BookingManageMenu extends AbstractMenu {
         System.out.println("> Select air dates: ");
         LocalDateTime airDate = selectAirDate(event.getAirDates());
         System.out.println("> Select seats: ");
-        Set<Long> seats = selectSeats(event, airDate);
+        Set<Long> seats = null;
+        try {
+            seats = selectSeats(event, airDate);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+            return;
+        }
         System.out.println("> Select user: ");
 
         Optional<User> userOpt = selectDomainObject(userService, u -> u.getFirstName() + " " + u.getLastName());
@@ -142,17 +160,27 @@ public class BookingManageMenu extends AbstractMenu {
 
         User user = userOpt.get();
 
-        double price = bookingService.getTicketsPrice(event, airDate, user, seats);
+        double price = 0;
+        try {
+            price = bookingService.getTicketsPrice(event, airDate, user, seats);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+            return;
+        }
         printDelimiter();
         System.out.println("Price for tickets: " + price);
     }
 
-    private Set<Long> selectSeats(Event event, LocalDateTime airDate) {
-        Auditorium aud = event.getAuditoriums().get(airDate);
+    private Set<Long> selectSeats(Event event, LocalDateTime airDate) throws ApplicationException {
+        Long audId = event.getAuditoriumsIds().get(airDate);
+        Optional<Auditorium> aud = audService.getAll().stream().filter(a -> a.getId().equals(audId)).findFirst();
+        if(!aud.isPresent()){
+            throw new ApplicationException("There is no auditorium with provided id.");
+        }
 
         Set<Ticket> tickets = bookingService.getPurchasedTicketsForEvent(event, airDate);
         List<Long> bookedSeats = tickets.stream().map(t -> t.getSeat()).collect(Collectors.toList());
-        List<Long> freeSeats = aud.getAllSeats().stream().filter(seat -> !bookedSeats.contains(seat))
+        List<Long> freeSeats = aud.get().getAllSeats().stream().filter(seat -> !bookedSeats.contains(seat))
                 .collect(Collectors.toList());
 
         System.out.println("Free seats: ");
@@ -170,7 +198,7 @@ public class BookingManageMenu extends AbstractMenu {
         return set;
     }
 
-    private LocalDateTime selectAirDate(NavigableSet<LocalDateTime> airDates) {
+    private LocalDateTime selectAirDate(Set<LocalDateTime> airDates) {
         List<LocalDateTime> list = airDates.stream().collect(Collectors.toList());
         for (int i = 0; i < list.size(); i++) {
             System.out.println("[" + (i + 1) + "] " + formatDateTime(list.get(i)));

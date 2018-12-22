@@ -2,7 +2,6 @@ package aspectsRepositories;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import utility.Tuple;
 
 import javax.sql.DataSource;
