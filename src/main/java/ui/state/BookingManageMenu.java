@@ -175,7 +175,7 @@ public class BookingManageMenu extends AbstractMenu {
         Long audId = event.getAuditoriumsIds().get(airDate);
         Optional<Auditorium> aud = audService.getAll().stream().filter(a -> a.getId().equals(audId)).findFirst();
         if(!aud.isPresent()){
-            throw new ApplicationException("There is no auditorium with provided id.");
+            return new HashSet<>();
         }
 
         Set<Ticket> tickets = bookingService.getPurchasedTicketsForEvent(event, airDate);

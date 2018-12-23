@@ -2,11 +2,20 @@ package domainModel;
 
 public enum EventRating {
 
-    LOW,
+    LOW(0),
 
-    MID,
+    MID(1),
 
-    HIGH;
+    HIGH(2);
+
+    private final int value;
+    EventRating(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 
 }
 

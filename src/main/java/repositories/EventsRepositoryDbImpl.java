@@ -1,5 +1,6 @@
 package repositories;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import domainModel.Event;
 import domainModel.EventRating;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class EventsRepositoryDbImpl extends DbRepositoryImpl<Event> implements EventsRepository {
 
@@ -39,9 +41,11 @@ public class EventsRepositoryDbImpl extends DbRepositoryImpl<Event> implements E
 
                         HashSet<LocalDateTime> airDatesForEvent = new HashSet<>();
                         for(String airDate : Splitter.on(",").split(airDates)){
-                            LocalDateTime date = LocalDateTime.parse(airDate, formatter);
-                            if( date != null){
-                                airDatesForEvent.add(date);
+                            if(airDate != null){
+                                LocalDateTime date = LocalDateTime.parse(airDate, formatter);
+                                if( date != null){
+                                    airDatesForEvent.add(date);
+                                }
                             }
                         }
 
@@ -92,13 +96,43 @@ public class EventsRepositoryDbImpl extends DbRepositoryImpl<Event> implements E
 
     @Override
     public void save(Event e) throws ApplicationException {
+        saveEvent(e);
+        saveAuditoriums(e);
+    }
 
-        throw new ApplicationException("Not implemented");
+    private void saveAuditoriums(Event e) {
+        for(Map.Entry<LocalDateTime,Long> item : e.getAuditoriumsIds().entrySet()){
+            Integer cnt = template.queryForObject(
+                    "SELECT count(*) FROM EventsAuditoriums WHERE eventId = ? AND auditoriumId = ?", Integer.class, e.getId(), item.getValue());
+            boolean exists = cnt != null && cnt > 0;
 
+            java.sql.Timestamp dateToSave = java.sql.Timestamp.valueOf(item.getKey());
 
+            if(!exists){
+                String insertSql = "INSERT INTO EventsAuditoriums (eventId,dateTime,auditoriumId) VALUES (?,?,?)";
+                template.update(insertSql, new Object[]{e.getId(), dateToSave, item.getValue()});
+            }else {
+                String updateSql = "UPDATE EventsAuditoriums SET dateTime = ? WHERE eventId = ? AND auditoriumId = ?";
+                template.update(updateSql, new Object[]{dateToSave, e.getId(), item.getValue()});
+            }
 
+        }
+    }
 
+    private void saveEvent(Event e) {
+        Integer cnt = template.queryForObject(
+                "SELECT count(*) FROM Events WHERE id = ?", Integer.class, e.getId());
+        boolean exists = cnt != null && cnt > 0;
 
+        String airDates = Joiner.on(',').join( e.getAirDates().stream().map(d -> d.format(formatter) ).collect(Collectors.toList()) );
+
+        if(exists){
+            String updateSql = "UPDATE Events SET name = ?, airDates = ?, basePrice = ?, rating = ? WHERE id = ?";
+            template.update(updateSql, new Object[]{e.getName(), airDates, e.getBasePrice(), e.getRating().getValue(), e.getId()});
+        }else {
+            String insertSql = "INSERT INTO Events (id,name,airDates,basePrice,rating) VALUES (?,?,?,?,?)";
+            template.update(insertSql, new Object[]{e.getId(), e.getName(), airDates, e.getBasePrice(), e.getRating().getValue()});
+        }
     }
 
     @Override
@@ -134,4 +168,6 @@ public class EventsRepositoryDbImpl extends DbRepositoryImpl<Event> implements E
             return resultSet.getLong("id");
         });
     }
+
+
 }
